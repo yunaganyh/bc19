@@ -5,7 +5,7 @@ import random
 __pragma__('iconv')
 __pragma__('tconv')
 __pragma__('opov')
-
+#This comment is to make sure that I'm (Habeeb) up to date with the rest of your local copies.
 # don't try to use global variables!!
 class MyRobot(BCAbstractRobot):
     step = -1
