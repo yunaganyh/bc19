@@ -7,9 +7,6 @@ __pragma__('iconv')
 __pragma__('tconv')
 __pragma__('opov')
 
-
-# don't try to use global variables!!
-
 class MyRobot(BCAbstractRobot):
 
     already_been = {}
