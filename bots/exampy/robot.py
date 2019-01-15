@@ -111,7 +111,7 @@ class MyRobot(BCAbstractRobot):
                         self.partialCastleLocsRecieved[r['id']] = coord
 
             if self.karbonite >= 20:
-                if self.me['turn'] % 2 == 0:
+                if self.me['turn'] % 2 == 0 or self.me['turn'] < 20:
                     # build a pilgrim
                     self.log("Building a pilgrim at " + str(self.me['x']+1) + ", " + str(self.me['y']+1))
                     return self.build_unit(SPECS['PILGRIM'], 1, 1)
