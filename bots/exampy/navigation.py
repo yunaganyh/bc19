@@ -44,14 +44,14 @@ def calculate_dir(start, target):
     return (dx, dy)
 
 rotate_arr = [    
-    (0,1),
-    (1,1),
-    (1,0),
-    (1,-1),
-    (0,-1),
-    (-1, -1),
-    (-1, 0),
-    (-1, 1)
+    [0, 1],
+    [1, 1],
+    [1, 0],
+    [1, -1],
+    [0, -1],
+    [-1, -1],
+    [-1, 0],
+    [-1, 1]
 ]
 
 def get_list_index(lst, tup):
@@ -91,7 +91,7 @@ def goto(loc, target, full_map, robot_map, already_been):
     goal_dir = calculate_dir(loc, target)
     if goal_dir is (0,0):
         return (0,0)
-    # self.log("MOVING FROM " + str(my_coord) + " TO " + str(nav.dir_to_coord[goal_dir]))
+    self.log("MOVING FROM " + str(my_coord) + " TO " + str(nav.dir_to_coord[goal_dir]))
     i = 0
     while not is_passable(full_map, loc, goal_dir, robot_map) and i < 4:# or apply_dir(loc, goal_dir) in already_been: # doesn't work because `in` doesn't work :(
         # alternate checking either side of the goal dir, by increasing amounts (but not past directly backwards)

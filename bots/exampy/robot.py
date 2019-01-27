@@ -15,7 +15,7 @@ class MyRobot(BCAbstractRobot):
     enemyCastles = []
     pendingCastleLoc = None # have to send over two turns, this is for when we've only sent half a castle loc
     partialCastleLocsRecieved = dict()
-    adjacentdirs = [(0,1), (1,1), (1,0), (1,-1), (0,-1), (-1, -1), (-1, 0), (-1, 1),]
+    adjacentdirs = [[0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1],]
     spawnloc = None
 
     def turn(self):
@@ -77,6 +77,20 @@ class MyRobot(BCAbstractRobot):
                 self.destination = nav.reflect(self.map, my_coord, self.me['id'] % 2)
             return self.move(*nav.goto(my_coord, self.destination, self.map, visible_robot_map, self.already_been))
 
+        elif self.me['unit'] == SPECS['PROPHET']:
+            self.log('Prophet health: ' + str(self.me['health']))
+            if attackable:
+                r = attackable[0]
+                self.log('attacking! ' + str(r) + ' at loc ' + (r['x'] - self.me['x'], r['y'] - self.me['y']))
+                return self.attack(r['x'] - self.me['x'], r['y'] - self.me['y'])
+
+        elif self.me['unit'] == SPECS['PREACHER']:
+            self.log('Prophet health: ' + str(self.me['health']))
+            if attackable:
+                r = attackable[0]
+                self.log('attacking! ' + str(r) + ' at loc ' + (r['x'] - self.me['x'], r['y'] - self.me['y']))
+                return self.attack(r['x'] - self.me['x'], r['y'] - self.me['y'])
+
         elif self.me['unit'] == SPECS['PILGRIM']:
             if self.destination is None:
                 # find nearest karbonite
@@ -111,14 +125,53 @@ class MyRobot(BCAbstractRobot):
                         self.partialCastleLocsRecieved[r['id']] = coord
 
             if self.karbonite >= 20:
-                if self.me['turn'] % 2 == 0 or self.me['turn'] < 20:
+                xmap = 1
+                ymap = 1
+                self.log('original position: ' + str(self.me['x']+xmap) + ' ' + str(self.me['y']+ymap))
+                rotate_arr = [    
+                    [0, 1],
+                    [1, 1],
+                    [1, 0],
+                    [1, -1],
+                    [0, -1],
+                    [-1, -1],
+                    [-1, 0],
+                    [-1, 1]
+                ]
+                self.log(str(self.me['x']) + ' ' + self.me['y'])
+                for direction in rotate_arr:
+                    self.log('checking if tile is empty')
+                    self.log(direction)
+                    self.log(visible_robot_map[self.me['x']+direction[0]][self.me['y']+direction[1]])
+                    self.log(self.map[self.me['x']+direction[0]][self.me['y']+direction[1]])
+                    if visible_robot_map[self.me['x']+direction[0]][self.me['y']+direction[1]] == 0 and self.map[self.me['x']+direction[0]][self.me['y']+direction[1]] == True:
+                        xmap = direction[0]
+                        ymap = direction[1]
+                        self.log('is empty and passable tile: ' + str(visible_robot_map[self.me['x']+xmap][self.me['y']+ymap]) + ' ' + self.map[self.me['x']+direction[0]][self.me['y']+direction[1]])
+                        break
+
+                self.log('xmap ' + str(xmap) + ' ymap ' + str(ymap))
+                if visible_robot_map[self.me['x']+direction[0]][self.me['y']+direction[1]] != 0:
+                    self.log('no adjacent unoccupied tiles')
+                    return self.move(*nav.goto(my_coord, self.destination, self.map, visible_robot_map, self.already_been))
+
+                self.log('new position: ' + str(self.me['x']+xmap) + ' ' +   str(self.me['y']+ymap))
+                if (self.me['turn'] % 7 == 0) or (self.me['turn'] < random.randint(15,30)):
                     # build a pilgrim
-                    self.log("Building a pilgrim at " + str(self.me['x']+1) + ", " + str(self.me['y']+1))
-                    return self.build_unit(SPECS['PILGRIM'], 1, 1)
-                else:
+                    self.log("Building a pilgrim at " + str(self.me['x']+xmap) + ", " + str(self.me['y']+ymap))
+                    return self.build_unit(SPECS['PILGRIM'], xmap, ymap)
+                elif self.me['turn'] % 2 == 0:
                     # crusader
-                    self.log("Building a crusader at " + str(self.me['x']+1) + ", " + str(self.me['y']+1))
-                    return self.build_unit(SPECS['CRUSADER'], 1, 1)
+                    self.log("Building a crusader at " + str(self.me['x']+xmap) + ", " + str(self.me['y']+ymap))
+                    return self.build_unit(SPECS['CRUSADER'], xmap, ymap)
+                elif self.me['turn'] % 3 == 0:
+                    #build a prophet
+                    self.log("Building a prophet at " + str(self.me['x'] + xmap) + ", " + str(self.me['y']+ymap))
+                    return self.build_unit(SPECS['PROPHET'],xmap,ymap)
+                elif self.me['turn'] % 5 == 0:
+                    #build a preacher
+                    self.log("Building a preacher at " + str(self.me['x']+xmap) + ", " + str(self.me['y']+ymap))
+                    return self.build_unit(SPECS['PREACHER'],xmap,ymap)
 
             else:
                 self.log("Castle health: " + self.me['health'])
